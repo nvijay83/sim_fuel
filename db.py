@@ -61,6 +61,7 @@ def update_db(kart,fuel,cur_lap):
   db[kart][1].append((cur_lap, fuel))
   with open(get_db(),'w') as fp:
     json.dump(db, fp, ensure_ascii=False)
+  return lap_empty
 
 def get_race():
   with open(get_db()) as fp:

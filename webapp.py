@@ -41,8 +41,8 @@ def update():
   kart = int(request.form['kart'])
   cur_lap = int(request.form['cur_lap'])
   fuel = int(request.form['fuel'])
-  update_db(kart, fuel, cur_lap)
-  s="Update successful: kart %d, current lap %d, fuel %d"%(kart,cur_lap,fuel)
+  lap_empty=update_db(kart, fuel, cur_lap)
+  s="Update successful: kart %d, current lap %d, fuel %d lap empty %d"%(kart,cur_lap,fuel,lap_empty)
   print s
   return render_template("update.html", update_string=s)
 
