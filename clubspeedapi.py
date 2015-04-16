@@ -1,6 +1,80 @@
 import requests
 from lxml import html
 import json
+import os.path
+
+def create_cust_directory():
+  try:
+    os.stat(".db/cust")
+  except:
+    os.mkdir(".db/cust")
+
+def create_heat_directory():
+  try:
+    os.stat(".db/heats")
+  except:
+    os.mkdir(".db/heats")
+
+def get_cust_directory():
+  return ".db/cust/"
+
+def get_cust_file(cust):
+  return get_cust_directory()+str(cust)+".json"
+
+def is_cust_available(cust):
+  if os.path.exists(get_cust_file(cust)):
+    return True
+  else:
+    return False
+
+def get_cust_db(cust):
+  if not is_cust_available(cust):
+    return None
+  else:
+    with open(get_cust_file(cust)) as fp:
+      data = json.load(fp)
+  return data
+
+'''pass array of heats,kart tuple'''
+def compare_cust_with_cache(cust, heats):
+  data = get_cust_db(cust)
+  if data is None:
+    return False
+  else:
+    return data[cust] == heats
+
+'''
+   return cust -> heats, cached
+'''
+def get_cust_heats(cust, cached):
+  customer = {}
+  if cached == True:
+    data = get_cust_db(cust)
+    if data is not None:
+      return data, True
+  url = get_url_cust(cust)
+  tree = get_tree(url)
+  l = tree.xpath("//tr[@class='Normal']/td/a")
+  l = [int(i.attrib['href'].split('=')[1]) for i in l]
+  kart = tree.xpath("//tr[@class='Normal']/td/a/text()")
+  kart = [int(i.split("Kart")[1].strip()) for i in kart]
+  customer[cust] = []
+  for i,j in zip(l,kart):
+    customer[cust].append((i,j))
+  return customer, False
+
+def write_cust_db(cust, data):
+  with open(get_cust_file(cust),'w') as fp:
+    json.dump(data,fp)
+
+def get_heat_directory():
+  return ".db/heats/"
+
+def is_heat_cached(heatno):
+  if os.path.exists(get_heat_directory()+str(heatno)+".json"):
+    return True
+  else:
+    return False
 
 def get_name_id_map(tree):
   data = {}
@@ -97,9 +171,12 @@ def populate_cust_db(directory, seed):
   with open(directory+"/cust_map.json",'w') as f:
     json.dump(cust, f)
 
+def get_title(tree):
+  return tree.xpath("//title/text()")[0].strip()
+
 ''' No Such URL exist'''
 def is_valid_heat(tree):
-  title = tree.xpath("//title/text()")[0]
+  title = get_title(tree) 
   if title == "Server Error":
     return False
   else:
@@ -127,30 +204,42 @@ def is_heat_complete(tree):
     return True
 
 '''returns json'''
-def get_file_db(directory, filename):
+def get_heat_db(heatno):
   data = {}
+  if not is_heat_cached(heatno):
+    return None
   try:
-    with open(director+"/"+filename,'r') as fp:
+    with open(get_heat_directory()+str(heatno)+".json",'r') as fp:
       data = json.load(fp)
   except IOError:
     return None
   return data
 
-def write_file_db(data, directory, filename):
-  with open(director+"/"+filename,'w') as fp:
+def write_heat_db(data, filename):
+  with open(get_heat_directory()+str(filename)+".json",'w') as fp:
     json.dump(data, fp)
 
 '''
   Return True if written to file
   returns False if the race is incomplete
 '''
-def get_and_write_completed_heat(directory, heatno):
-  data,complete = get_heat(directory, heatno)
+def get_and_write_completed_heat(heatno, cached):
+  data,complete,cached= get_heat(heatno, cached)
   if complete is True:
-    write_file_db(data, directory, heatno)
+    write_heat_db(data, heatno)
     return True
   else:
     return False
+
+def get_date(tree):
+  if is_valid_heat(tree):
+    return tree.xpath("//span[@id='lblDate']/text()")[0].encode('ascii','ignore')
+  return None
+
+def get_type(tree):
+  if is_valid_heat(tree):
+    return tree.xpath("//span[@id='lblRaceType']/text()")[0].encode('ascii','ignore')
+  return None
 
 '''goes + and - hint/2'''
 def look_for_races(seed, hint):
@@ -164,7 +253,7 @@ def look_for_races(seed, hint):
   for i in range(heatno, heatno+hint):
     url = get_url_heat(i)
     tree = get_tree(url)
-    title = tree.xpath("//title/text()")[0]
+    title = get_title() 
     if title == "Server Error":
       print "Server error: %s",(url)
       continue
@@ -176,28 +265,33 @@ def look_for_races(seed, hint):
         complete = 0
       else:
         complete = 2
-    date = tree.xpath("//span[@id='lblDate']/text()")
-    race_type = tree.xpath("//span[@id='lblRaceType']/text()")
+    date = get_date(tree)
+    race_type = get_type(tree) 
     l.append((i,race_type,date,complete))
-  
+
   return l
 
-def get_heat(directory, heatno):
+def get_heat(heatno, cached):
+  if cached == True:
+    data = get_heat_db(heatno)
+    if data is not None:
+      return data, True, True
   url = get_url_heat(heatno)
-  race = []
+  race = {}
   racer = {}
   tree = get_tree(url)
-  title = tree.xpath("//title/text()")[0]
-  if title == "Server Error":
-    print "Server Error"
-    return None, None
+  if not is_valid_heat(tree):
+    raise Exception("Not Valid Heat Race")
   complete = is_heat_complete(tree)
   ''' Race still in progress. Giver partial info
       If data is [] then race not scheduled'''
   if complete is False:
     data = get_alllaps(tree)
-    return data, False
+    return data, False, False
   '''Complete race give the entire json'''
+  race['date'] = get_date(tree)
+  race['type'] = get_type(tree)
+  race['details'] = []
   name = get_racername(tree)
   ids = get_id(tree)
   totlap = get_totallaps(tree)
@@ -212,13 +306,30 @@ def get_heat(directory, heatno):
     racer['avglap'] = avglap[count]
     racer['bestlap'] = bestlap[count]
     racer['alllaps'] = d[i]
-    race.append(racer)
+    race['details'].append(racer)
     racer = {}
     count = count + 1
-  return race, True
+  return race, True, False
 
+create_cust_directory()
+data,cached = get_cust_heats(1038352,False)
+write_cust_db(1038352, data)
+create_heat_directory()
+if data is not None:
+  for i,j in data[1038352]:
+    get_and_write_completed_heat(i, True)
+
+#print data
+#write_cust_db(1038352, data)
 #populate_cust_db('.',1038352)
 #print look_for_races('163952',10)
+#create_heat_directory()
+#get_and_write_completed_heat('.',163952)
+#print get_heat(163952, True)
+#print ""
+#print get_heat(163952, False)
+
+'''
 s = ""
 f = open('Desktop/clubspeed.html','r')
 for i in f:
@@ -230,3 +341,4 @@ print is_valid_heat(tree)
 print is_heat_in_progress(tree)
 print is_heat_complete(tree)
 print get_alllaps(tree)
+  '''
