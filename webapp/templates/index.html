@@ -1,0 +1,57 @@
+<html>
+<head><title>Create Enduro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- jQuery JS -->
+    <script src="{{ url_for('static', filename='jquery/jquery.min.js') }}"></script>
+
+    <!-- Bootbox JS -->
+    <script src="{{ url_for('static', filename='bootbox/bootbox.min.js') }}"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap core JS -->
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+</head>
+<body>
+<div class="container">
+    <form method="post" action="create">
+        <!--<table>
+            <tr>
+                <td>Init Fuel</td>
+                <td><input type="text" name="init_fuel"/></td>
+            </tr>
+            <tr>
+                <td>Max Fuel</td>
+                <td><input type="text" name="max_fuel"/></td>
+            </tr>
+            <tr>
+                <td>Races to Monitor</td>
+                <td><input type="text" name="races"/></td>
+            </tr>
+        </table>-->
+        <div class="form-group">
+            <label for="Init Fuel">Init Fuel</label>
+            <input type="text" class="form-control" name="init_fuel" placeholder="Initial fuel"/>
+        </div>
+        <div class="form-group">
+            <label for="Max fuel">Max Fuel</label>
+            <input type="text" class="form-control" name="max_fuel" placeholder="Max Fuel"/>
+        </div>
+        <div class="form-group">
+            <label for="Races to Monitor">Races to Monitor</label>
+            <input type="text" class="form-control" name="races" placeholder="Number of races to monitor"/>
+        </div>
+        <div class="form-group">
+            <label for="Track list">Select Track</label>
+            <select class="form-control" id="sel1" name="track">
+                {% for o in tracks %}
+                    <option value="{{o['id']}}">{{o['name']}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create</button>
+    </form>
+</div>
+</body>
+</html>

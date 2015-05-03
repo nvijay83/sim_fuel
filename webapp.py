@@ -1,6 +1,6 @@
 from operator import itemgetter
 import re
-from flask import Flask, request, render_template, redirect, url_for, abort, flash, jsonify
+from flask import Flask, request, render_template, redirect, url_for, abort,flash, jsonify,send_from_directory
 # noinspection PyUnresolvedReferences
 #from flask.ext.login import LoginManager, login_user
 # noinspection PyUnresolvedReferences
@@ -13,39 +13,84 @@ app = Flask(__name__, static_folder='webapp/static', template_folder='webapp/tem
 
 @app.route('/live',methods=['GET','POST'])
 def live():
-  karts = get_race()
-  start = "<td><p>"
-  end = "</p></td>"
-  glb=""
-  s = ""
-  l = sorted(karts)
-  l = [int(i) for i in l]
-  l = sorted(l)
-  for i in l:
-    s=s+"<tr>"+start+str(i)+end
-    s=s+start+str(karts[str(i)][0])+end+"</tr>\n"
-  f = open('live.html','r')
-  for i in f:
-    if "insert_here" in i:
-      glb = glb+s
-    else:
-      glb = glb+i
-  f.close()
-  return glb
+  racers, finished = Racer.get_live_scoreboard()
+  sorted_racers = [racers[i] for i in racers]
+  if not finished:
+    sorted_racers.sort(key=lambda k: k['kart'])
+  else:
+    sorted_racers.sort(key=lambda k: k['nickname'])
+  return render_template('live.html', racers=sorted_racers, finished=finished)
 
-@app.route('/up', methods=['GET','POST'])
+
+@app.route('/create', methods=['GET','POST'])
+def create():
+  init_fuel = int(request.form['init_fuel'])
+  max_fuel = int(request.form['max_fuel'])
+  races = int(request.form['races'])
+  print request.form['track']
+  track_id = int(request.form['track'])
+  create_race(init_fuel, max_fuel, races, track_id)
+  init_race()
+  return render_template('admin.html')
+
+@app.route('/fix', methods=['GET','POST'])
+def fix():
+  cur_race = Race.get_in_progress_race()
+  if cur_race is  None:
+    return "No race in progress"
+  else:
+    racers = Racer.get_racers(cur_race)
+  racers.sort(key=lambda k:k['kart'])
+  return render_template("fix.html", update_string="", racers=racers)
+
+@app.route('/correction',methods=['POST'])
+def correction():
+  cust_id = int(request.form['cust_id'])
+  fuel = int(request.form['fuel'])
+  update_string="updated: cust_id is %d, fuel is %d"%(cust_id,fuel)
+  print update_string
+  cur_race = Race.get_in_progress_race()
+  add_fuel_correction(cust_id, fuel)
+  if cur_race is  None:
+    return "No race in progress"
+  else:
+    racers = Racer.get_racers(cur_race)
+  racers.sort(key=lambda k:k['kart'])
+  return render_template("fix.html",update_string=update_string, racers=racers)
+
+@app.route('/up',methods=['GET','POST'])
 def up():
-  return render_template("update.html",update_string="") 
+  cur_race = Race.get_in_progress_race()
+  if cur_race is  None:
+    return "No race in progress"
+  else:
+    racers = Racer.get_racers(cur_race)
+  racers.sort(key=lambda k:k['kart'])
+  return render_template("up.html", racers=racers)
+
 @app.route('/update', methods=['GET','POST'])
 def update():
-  kart = int(request.form['kart'])
-  cur_lap = int(request.form['cur_lap'])
+  cust_id = int(request.form['cust_id'])
+  print request.form['fuel']
   fuel = int(request.form['fuel'])
-  lap_empty=update_db(kart, fuel, cur_lap)
-  s="Update successful: kart %d, current lap %d, fuel %d lap empty %d"%(kart,cur_lap,fuel,lap_empty)
-  print s
-  return render_template("update.html", update_string=s)
+  add_fuel(cust_id, fuel)
+  cur_race = Race.get_in_progress_race()
+  if cur_race is  None:
+    return "No race in progress"
+  else:
+    racers = Racer.get_racers(cur_race)
+  racers.sort(key=lambda k:k['kart'])
+  print "added cust_id %d, fuel %s"%(cust_id,fuel)
+  return render_template("up.html", racers=racers)
 
+@app.route('/cr')
+def cr():
+  tracks = ClubSpeedApi.get_tracks_api()
+  return render_template("index.html",tracks=tracks)
+
+@app.route('/')
+def index():
+  return render_template("admin.html")
 
 if __name__ == "__main__":
     # TODO: move to config

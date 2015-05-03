@@ -57,6 +57,10 @@ docs/_build/
 # PyBuilder
 target/
 
+#ide
+.idea/
+.idea
+
 #app specific
 .DS_Store
 *.swp

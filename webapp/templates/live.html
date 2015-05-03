@@ -1,0 +1,80 @@
+<html>
+<head>
+<meta http-equiv="refresh" content="10">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- jQuery JS -->
+    <script src="{{ url_for('static', filename='jquery/jquery.min.js') }}"></script>
+
+    <!-- Bootbox JS -->
+    <script src="{{ url_for('static', filename='bootbox/bootbox.min.js') }}"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap core JS -->
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+<title>Enduro</title>
+<style>
+<!--table, th, td {
+     border: 5px solid white;
+     text-align: right;
+}-->
+td {
+  font-size:50pt;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    {% if finished %}
+    <table style="width: auto;" class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Laps Empty</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in racers %}
+        {% if i['laps_empty'] > 20 %}
+        <tr class="active"><td>{{i['nickname']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% elif i['laps_empty'] > 5 %}
+        <tr class="info"><td>{{i['nickname']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% elif i['laps_empty'] > 0 %}
+        <tr class="warning"><td>{{i['nickname']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% else %}
+        <tr class="danger"><td>{{i['nickname']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>kart Number</th>
+                <th>Laps</th>
+                <th>Last Lap</th>
+                <th>Laps Empty</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in racers %}
+        {% if i['laps_empty'] > 20 %}
+        <tr class="active"><td>{{i['kart']}}</td><td>{{i['laps']}}</td><td>{{i['last_lap']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% elif i['laps_empty'] > 5 %}
+        <tr class="info"><td>{{i['kart']}}</td><td>{{i['laps']}}</td><td>{{i['last_lap']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% elif i['laps_empty'] > 0 %}
+        <tr class="warning"><td>{{i['kart']}}</td><td>{{i['laps']}}</td><td>{{i['last_lap']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% else %}
+        <tr class="danger"><td>{{i['kart']}}</td><td>{{i['laps']}}</td><td>{{i['last_lap']}}</td><td>{{i['laps_empty']}}</td></tr>
+        {% endif %}
+        {% endfor %}
+        </tbody>
+     </table>
+    {% endif %}
+
+
+</div>
+</body>
+</html>

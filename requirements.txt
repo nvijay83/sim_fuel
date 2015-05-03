@@ -1,5 +1,5 @@
 flask
-#flask-login
-#flask-security
+flask-login
+flask-security
 requests
 tinydb

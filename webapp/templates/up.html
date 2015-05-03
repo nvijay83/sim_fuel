@@ -1,0 +1,94 @@
+<html>
+<head>
+    <!-- jQuery JS -->
+    <script src="{{ url_for('static', filename='jquery/jquery.min.js') }}"></script>
+
+    <!-- Bootbox JS -->
+    <script src="{{ url_for('static', filename='bootbox/bootbox.min.js') }}"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap core JS -->
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <style>
+        p {
+        font-size:20px;
+        }
+        p.big {
+        font-size:40px;
+        }
+    </style>
+    <script>
+  var num;
+  var start;
+  function counter(time){
+    document.getElementById("timer").innerHTML = time;
+  }
+
+  function kart(text,numb) {
+    count = 0;
+    document.getElementById("rewrite").innerHTML = numb;
+    num = text;
+    document.getElementById("stop").style.display = "block";
+    document.getElementById("cancel").style.display = "block";
+    start = setInterval(function() {counter(++count)}, 1000);
+  }
+
+  function stop() {
+    clearInterval(start);
+    var fuel = document.getElementById("timer").innerHTML;
+    var http = new XMLHttpRequest();
+    var url = "/update";
+    var params = "fuel="+fuel+"&cust_id="+num;
+    http.open("POST", url, false);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.setRequestHeader("Content-length", params.length);
+    http.setRequestHeader("Connection", "close");
+    http.send(params);
+    location.reload();
+  }
+  function cancel() {
+    clearInterval(start);
+    location.reload();
+  }
+
+
+    </script>
+</head>
+<body>
+<div class="container">
+    <table class="table">
+        <tr>
+            {% for i in racers %}
+            <td>
+                <button class="btn btn-primary btn-block"
+                        onclick="kart({{i['cust_id']}},{{i['kart']}})"><p>{{i['kart']}}</p></button>
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+<div class="container">
+    <table class="table">
+        <tr>
+            <td><p>Selected Kart</p></td>
+            <td><p class="big" id="rewrite">Number</p></td>
+        </tr>
+        <tr>
+            <td><p>Timer</p></td>
+            </td>
+            <td><h3><p class="big" id="timer">0</p></h3></td>
+        </tr>
+        <tr>
+            <td>
+                <button class="btn btn-success btn-lg" id="stop" style="display:none;" onclick="stop()">stop</button>
+            </td>
+            <td>
+                <button class="btn btn-danger btn-lg" id="cancel" style="display:none;" onclick="cancel()">cancel</button>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

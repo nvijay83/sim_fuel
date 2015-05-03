@@ -1,0 +1,98 @@
+.navbar-inverse {
+    background-color: #E32135;
+    border-color: #E32135;
+}
+
+.navbar-inverse .navbar-brand {
+    color: #F0F0F0;
+}
+
+.glyphicon-ok {
+    color: #279100;
+}
+
+.glyphicon-pencil {
+    color: #FC5421;
+}
+
+.glyphicon-plus {
+    color: #FC5421;
+}
+
+.glyphicon-trash {
+
+}
+
+.button-enter-round-url {
+    background-color: #FFFFFF;
+    border: 0px;
+    padding: 0px;
+    vertical-align: middle !important;
+}
+
+.button-trash-round {
+    color: #444444;
+    background-color: #FFFFFF;
+    border: 0px;
+    padding: 0px;
+    vertical-align: middle !important;
+}
+
+.button-approve-session-points {
+    color: #428BCA;
+    background-color: #FFFFFF;
+    border: 0px;
+    padding: 0px;
+    vertical-align: middle !important;
+}
+
+.button-adjust-driver-points {
+    vertical-align: middle !important;
+}
+
+.button-disapprove-session-points {
+    color: #FC5421;
+    background-color: #FFFFFF;
+    border: 0px;
+    padding: 0px;
+    vertical-align: middle !important;
+}
+
+.button-delete-driver-name-correction {
+    color: #444444;
+    background-color: #FFFFFF;
+    border: 0px;
+    padding: 0px;
+    vertical-align: middle !important;
+}
+
+.button-add-driver-name-correction {
+    background-color: #FFFFFF;
+    border: 0px;
+    padding: 0px 0px 0px 5px;
+    vertical-align: middle !important;
+}
+
+.link-adjust-points {
+    color: #444444;
+    vertical-align: middle !important;
+}
+
+.link-adjust-points-session {
+    color: #444444;
+    padding: 0px 0px 0px 5px;
+    vertical-align: middle !important;
+}
+
+table th.text-center, table td.text-center {
+    text-align: center;
+}
+
+table th, table td {
+    vertical-align: middle !important;
+}
+
+.progress {
+    padding: 0px;
+    margin: 0px;
+}

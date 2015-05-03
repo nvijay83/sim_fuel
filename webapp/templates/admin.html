@@ -1,0 +1,26 @@
+<html>
+<head><title>Create Enduro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- jQuery JS -->
+    <script src="{{ url_for('static', filename='jquery/jquery.min.js') }}"></script>
+
+    <!-- Bootbox JS -->
+    <script src="{{ url_for('static', filename='bootbox/bootbox.min.js') }}"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap core JS -->
+    <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+</head>
+<body>
+<div class="container">
+    <table class="table">
+        <tr><a href="/cr"><button class="btn btn-link">Create</button></a></tr><br/>
+        <tr><a href="/live"><button class="btn btn-link">Live</button></a></tr><br/>
+        <tr><a href="/fix"><button class="btn btn-link">Correction</button></a></tr><br/>
+        <tr><a href="/up"><button class="btn btn-link">Fuel Update</button></a></tr><br/>
+    </table>
+</div>
+</body>
+</html>
