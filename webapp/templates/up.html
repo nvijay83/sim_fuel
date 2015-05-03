@@ -16,7 +16,7 @@
         font-size:20px;
         }
         p.big {
-        font-size:40px;
+        font-size:50px;
         }
     </style>
     <script>
@@ -33,6 +33,21 @@
     document.getElementById("stop").style.display = "block";
     document.getElementById("cancel").style.display = "block";
     start = setInterval(function() {counter(++count)}, 1000);
+    var http = new XMLHttpRequest();
+    var url = "/maxfuel";
+    var params = "cust_id="+num;
+    http.onreadystatechange=function()
+    {
+         if (http.readyState==4 && http.status==200)
+         {
+            document.getElementById("allowed_max").innerHTML=http.responseText;
+         }
+    }
+    http.open("POST", url, true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.setRequestHeader("Content-length", params.length);
+    http.setRequestHeader("Connection", "close");
+    http.send(params);
   }
 
   function stop() {
@@ -57,20 +72,23 @@
     </script>
 </head>
 <body>
+<br/>
+<br/>
 <div class="container">
-    <table class="table">
+    <table style="table-layout:fixed;" class="table table-condensed">
         <tr>
             {% for i in racers %}
             <td>
-                <button class="btn btn-primary btn-block"
+                <button class="btn-group btn-group-justified btn-lg btn-block btn-primary"
                         onclick="kart({{i['cust_id']}},{{i['kart']}})"><p>{{i['kart']}}</p></button>
             </td>
             {% endfor %}
         </tr>
     </table>
 </div>
+<br/>
 <div class="container">
-    <table class="table">
+    <table style="table-layout:fixed;" class="table">
         <tr>
             <td><p>Selected Kart</p></td>
             <td><p class="big" id="rewrite">Number</p></td>
@@ -78,14 +96,19 @@
         <tr>
             <td><p>Timer</p></td>
             </td>
-            <td><h3><p class="big" id="timer">0</p></h3></td>
+            <td><p class="big" id="timer">0</p></td>
+        </tr>
+        <tr>
+            <td><p>Max Allowed</p></td>
+            </td>
+            <td><p class="big" id="allowed_max">na</p></td>
         </tr>
         <tr>
             <td>
-                <button class="btn btn-success btn-lg" id="stop" style="display:none;" onclick="stop()">stop</button>
+                <button class="btn btn-success btn-lg btn-block" id="stop" style="display:none;" onclick="stop()">stop</button>
             </td>
             <td>
-                <button class="btn btn-danger btn-lg" id="cancel" style="display:none;" onclick="cancel()">cancel</button>
+                <button class="btn btn-danger btn-lg btn-block" id="cancel" style="display:none;" onclick="cancel()">cancel</button>
             </td>
         </tr>
     </table>

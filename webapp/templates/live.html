@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="10">
+<meta http-equiv="refresh" content="6">
      <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- jQuery JS -->
     <script src="{{ url_for('static', filename='jquery/jquery.min.js') }}"></script>
@@ -15,17 +15,19 @@
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
 <title>Enduro</title>
 <style>
-<!--table, th, td {
+table{
      border: 5px solid white;
-     text-align: right;
-}-->
+     text-align: left;
+     align: left;
+}
 td {
+  border: 5px solid white;
   font-size:50pt;
 }
 </style>
 </head>
 <body>
-<div class="container">
+<!--<div class="container">-->
     {% if finished %}
     <table style="width: auto;" class="table table-condensed">
         <thead>
@@ -49,7 +51,7 @@ td {
         </tbody>
     </table>
     {% else %}
-    <table class="table">
+    <table style="table-layout:fixed;" class="table">
         <thead>
             <tr>
                 <th>kart Number</th>
@@ -75,6 +77,6 @@ td {
     {% endif %}
 
 
-</div>
+<!--</div>-->
 </body>
 </html>

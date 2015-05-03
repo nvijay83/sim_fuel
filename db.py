@@ -137,6 +137,11 @@ class Racer:
   db1 = TinyDB(get_race_folder()+'/laps_empty.json')
 
   @staticmethod
+  def get_laps_empty(cust_id):
+    laps_empty = Racer.db1.search(where('cust_id') == cust_id)[0]
+    return laps_empty
+
+  @staticmethod
   def get_live_scoreboard():
     ret = {}
     cur_race = Race.get_in_progress_race()

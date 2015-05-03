@@ -61,6 +61,7 @@ def correction():
 @app.route('/up',methods=['GET','POST'])
 def up():
   cur_race = Race.get_in_progress_race()
+
   if cur_race is  None:
     return "No race in progress"
   else:
@@ -91,6 +92,29 @@ def cr():
 @app.route('/')
 def index():
   return render_template("admin.html")
+
+@app.route('/maxfuel', methods=['GET','POST'])
+def max_fuel():
+  print "here"
+  print ""
+  cust_id = int(request.form['cust_id'])
+  print cust_id
+  i,m,a,b = get_config()
+  laps_empty = Racer.get_laps_empty(cust_id)
+  cur_race = Race.get_in_progress_race()
+  if cur_race is not None:
+    racer, created = Racer.get_racer(cust_id,None, None, None, None, None, cur_race)
+    max_fuel = m - (laps_empty['laps_empty'] - racer.laps)
+    return str(max_fuel)
+  else:
+    return str(0)
+
+'''
+import sys
+sys.path.append("unit/")
+from fake_race import *
+test1()
+'''
 
 if __name__ == "__main__":
     # TODO: move to config
