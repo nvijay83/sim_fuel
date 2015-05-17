@@ -8,6 +8,7 @@ import tinydb
 import threading
 from tinydb import TinyDB, where
 import requests
+import datetime
 
 def get_race_folder():
   return ".db/"+time.strftime("%m-%d-%Y")
@@ -16,6 +17,34 @@ try:
   os.stat(t)
 except:
   os.mkdir(t)
+
+def get_all_race_folders():
+  return [x[0] for x in os.walk('.db')][1:]
+
+def verify_db_complete(directory):
+  x = os.listdir(directory)
+  dbs = ['config.json','laps.json','logs.json','laps_empty.json','race.json','race_log.json']
+  return all(i in x for i in dbs)
+
+def get_report(directory):
+  db = TinyDB(directory+'/config.json')
+  conf = db.all()[0]
+  print "Initial Fuel:",conf['init_fuel']
+  print "Max Fuel:",conf['max_fuel']
+  print "Fuel Strategy:"
+  db = TinyDB(directory+'/laps_empty.json')
+  db1 = TinyDB(directory+'/logs.json')
+  db2 = TinyDB(directory+'/laps.json')
+  laps_empty = db.all()
+  for i in laps_empty:
+    nickname = db2.search(where('cust_id') == i['cust_id'])[0]['nickname']
+    print "Team %s was left with %d laps worth of fuel"%(nickname,i['laps_empty'])
+    pits = db1.search(where('cust_id') == i['cust_id'])
+    count = 0
+    for j in pits:
+      count = count + 1
+      print "%d. On lap: %d Added %d at %s"%(count,j['laps'],j['fuel'],datetime.datetime.fromtimestamp(j['time']).strftime('%H:%M:%S'))
+
 
 def create_race(init_fuel, max_fuel, races, track_id):
   t = get_race_folder()
@@ -160,8 +189,8 @@ class Racer:
     else:
       cur_race = Racer.get_racers(cur_race)
       for i in cur_race:
-        ret[i['cust_id']] = {'last_lap':i['last_lap'],'laps':i['laps'],'kart':i['kart'],'laps_empty':dic[i['cust_id']]-i['laps']}
-    return ret, False
+        ret[i['cust_id']] = {'nickname':i['nickname'],'last_lap':i['last_lap'],'laps':i['laps'],'kart':i['kart'],'laps_empty':dic[i['cust_id']]-i['laps']}
+    return ret, True
 
 
   @staticmethod
@@ -231,7 +260,8 @@ class Racer:
 
 def print_racers(racers):
   for i in racers:
-    print i, racers[i]
+    pass
+#print i, racers[i]
 
 class ClubSpeedApi:
   url = "http://lmkfremont.clubspeedtiming.com/api/index.php/"
@@ -323,7 +353,12 @@ def monitor(init_fuel, max_fuel, races, track_id):
           cust.update(i['lap_num'],i['kart_num'],i['average_lap_time'],i['last_lap_time'])
       print_racers(racers)
       time.sleep(3)
-
+'''
+x=get_all_race_folders()
+for i in x:
+  print i,verify_db_complete(i)
+get_report('.db/05-12-2015')
+'''
 #create_race(60,60,2,1)
 #init_race()
 #print get_config()
